@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Unreleased Changes
+------------------
+
+* Fix ``Units set to "None"`` error when retrieving RDS "Total storage for all DB instances" quota from Service Quotas. AWS changed the quota unit from "Gigabytes" to "None" without announcement. We now allow both unit types (similar to the fix for ELB in Issue #503).
+
 .. _changelog.12_0_0:
 
 12.0.0 (2021-08-04)
