@@ -46,6 +46,24 @@ from ..limit import AwsLimit
 logger = logging.getLogger(__name__)
 
 
+def allow_gigabytes_or_none_units(value, in_unit, out_unit):
+    """
+    This is a unit converter for Service Quotas; see
+    :py:meth:`.ServiceQuotasClient.get_quota_value` for details.
+
+    This is a work-around for AWS changing the quota unit for "Total storage
+    for all DB instances" from "Gigabytes" to "None" without announcement.
+    This converter allows both options and treats them identically.
+    """
+    if in_unit not in ['None', 'Gigabytes'] or out_unit != 'Gigabytes':
+        logger.error(
+            'ERROR: cannot convert Service Quotas RDS storage limit value from '
+            'units of "%s" to units of "%s"', in_unit, out_unit
+        )
+        return None
+    return value
+
+
 class _RDSService(_AwsService):
 
     service_name = 'RDS'
@@ -172,7 +190,8 @@ class _RDSService(_AwsService):
             self.critical_threshold,
             limit_type='AWS::RDS::DBInstance',
             quotas_name='Total storage for all DB instances',
-            quotas_unit='Gigabytes'
+            quotas_unit='Gigabytes',
+            quotas_unit_converter=allow_gigabytes_or_none_units
         )
         limits['DB snapshots per user'] = AwsLimit(
             'DB snapshots per user',

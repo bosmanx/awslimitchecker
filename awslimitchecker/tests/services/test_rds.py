@@ -39,7 +39,7 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 
 import sys
 from awslimitchecker.tests.services import result_fixtures
-from awslimitchecker.services.rds import _RDSService
+from awslimitchecker.services.rds import _RDSService, allow_gigabytes_or_none_units
 
 # https://code.google.com/p/mock/issues/detail?id=249
 # py>=3.4 should use unittest.mock not the mock package on pypi
@@ -50,6 +50,18 @@ if (
     from mock import patch, call, Mock, DEFAULT
 else:
     from unittest.mock import patch, call, Mock, DEFAULT
+
+
+class TestAllowGigabytesOrNoneUnits:
+
+    def test_none(self):
+        assert allow_gigabytes_or_none_units(100, 'None', 'Gigabytes') == 100
+
+    def test_gigabytes(self):
+        assert allow_gigabytes_or_none_units(100, 'Gigabytes', 'Gigabytes') == 100
+
+    def test_other(self):
+        assert allow_gigabytes_or_none_units(100, 'Other', 'Gigabytes') is None
 
 
 class Test_RDSService(object):
@@ -96,6 +108,10 @@ class Test_RDSService(object):
             assert limit.service == cls
             assert limit.def_warning_threshold == 21
             assert limit.def_critical_threshold == 43
+            if name == 'Storage quota (GB)':
+                assert limit.quotas_unit_converter == allow_gigabytes_or_none_units
+            else:
+                assert limit.quotas_unit_converter is None
 
     def test_get_limits_again(self):
         """test that existing limits dict is returned on subsequent calls"""
