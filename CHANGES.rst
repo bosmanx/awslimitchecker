@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Unreleased Changes
+------------------
+
+* `PR #515 <https://github.com/jantman/awslimitchecker/pull/515>`__ - Add Prometheus AlertManager alert provider with comprehensive test coverage. Supports sending alerts to AlertManager with configurable endpoints, alert duration, and basic authentication. Example usage: ``--alert-provider=AlertManager --alert-config=endpoints=http://alertmanager1:9093,http://alertmanager2:9093``. Thanks to `varuzam <https://github.com/varuzam>`__ for the original implementation.
+
 .. _changelog.12_0_0:
 
 12.0.0 (2021-08-04)
